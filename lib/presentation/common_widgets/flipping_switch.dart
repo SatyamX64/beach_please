@@ -9,24 +9,48 @@ class FlippingSwitch extends StatefulWidget {
       required this.background,
       required this.leftLabel,
       required this.rightLabel,
-      required this.onChange})
+      required this.onChange,
+      required this.tabHeight,
+      required this.tabWidth})
       : super(key: key);
 
   final Color color;
   final Color background;
   final String leftLabel;
   final String rightLabel;
+  final double tabHeight;
+  final double tabWidth;
+
   final void Function(bool) onChange;
   @override
   _FlippingSwitchState createState() => _FlippingSwitchState();
 }
 
 class _FlippingSwitchState extends State<FlippingSwitch>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
+  late AnimationController _tiltController;
   late AnimationController _flipController;
+  double _directionMultiplier = 1;
+  late Animation _tiltAnimation;
+  final double _maxTiltAngle = pi / 6;
   @override
   void initState() {
     super.initState();
+
+    _tiltController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+      reverseDuration: const Duration(milliseconds: 1500),
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _tiltController.reverse();
+        }
+      });
+
+    _tiltAnimation = CurvedAnimation(
+        parent: _tiltController,
+        curve: Curves.easeOut,
+        reverseCurve: Curves.elasticOut.flipped);
 
     _flipController = AnimationController(
       vsync: this,
@@ -39,6 +63,7 @@ class _FlippingSwitchState extends State<FlippingSwitch>
   @override
   void dispose() {
     _flipController.dispose();
+    _tiltController.dispose();
     super.dispose();
   }
 
@@ -48,26 +73,44 @@ class _FlippingSwitchState extends State<FlippingSwitch>
 
   void _flipSwitch() {
     if (_flipController.isCompleted) {
+      _directionMultiplier = -1;
+      _tiltController.forward();
       _flipController.reverse();
 
       widget.onChange.call(false);
     } else {
+      _directionMultiplier = 1;
       _flipController.forward();
+      _tiltController.forward();
       widget.onChange.call(true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        _buildTabsBackground(),
-        AnimatedBuilder(
+    return AnimatedBuilder(
+      animation: _tiltAnimation,
+      builder: (context, tabs) {
+        return Transform(
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.001)
+            ..rotateY(
+                _tiltAnimation.value * _maxTiltAngle * _directionMultiplier),
+          alignment: FractionalOffset(0.5, 1.0),
+          child: tabs,
+        );
+      },
+      child: Stack(
+        children: [
+          _buildTabsBackground(),
+          AnimatedBuilder(
             animation: _flipController,
             builder: (context, snapshot) {
               return _buildFlippingSwitch((pi * _flipController.value));
-            }),
-      ],
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -75,8 +118,8 @@ class _FlippingSwitchState extends State<FlippingSwitch>
     return GestureDetector(
       onTap: _flipSwitch,
       child: Container(
-        width: 250,
-        height: 64,
+        width: widget.tabWidth,
+        height: widget.tabHeight,
         decoration: BoxDecoration(
           color: widget.background,
           borderRadius: BorderRadius.circular(32),
@@ -90,7 +133,7 @@ class _FlippingSwitchState extends State<FlippingSwitch>
                   widget.leftLabel,
                   style: TextStyle(
                     color: widget.color,
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -102,7 +145,7 @@ class _FlippingSwitchState extends State<FlippingSwitch>
                   widget.rightLabel,
                   style: TextStyle(
                     color: widget.color,
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -144,7 +187,7 @@ class _FlippingSwitchState extends State<FlippingSwitch>
               style: TextStyle(
                   color: widget.background,
                   fontWeight: FontWeight.bold,
-                  fontSize: 20),
+                  fontSize: 18),
             ),
           ),
         ),

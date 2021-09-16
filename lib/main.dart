@@ -1,72 +1,127 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:lottie/lottie.dart';
 
-import 'flipping_switch.dart';
+import 'app/app_config.dart';
+import 'app/app_router.dart';
+import 'app/my_app.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((_) {
-    runApp(new MyApp());
-  });
+Future<void> main() async {
+  await MyApp.initGlobalConfigs();
+  runApp(
+    AppConfig(
+      name: 'Beach Please',
+      initialRoute: AppRouter.SPLASH,
+      flavour: Flavour.developement,
+      child: MyApp.run(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: MyHome(),
-    );
-  }
-}
 
-class MyHome extends StatelessWidget {
-  const MyHome({Key? key}) : super(key: key);
+// import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart';
+// import 'package:lottie/lottie.dart';
 
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Stack(
-          children: [
-            Container(
-              constraints: BoxConstraints.expand(),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [Colors.blue.shade200, Colors.white],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    stops: [0.0, 0.4]),
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              child: SizedBox(
-                // height: 120,
-                width: 360,
-                child: Lottie.network(
-                    'https://assets1.lottiefiles.com/packages/lf20_hhpngmih.json'),
-              ),
-            ),
-            Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: EdgeInsets.only(top: 48),
-                child: FlippingSwitch(
-                  color: Color(0xFFFFFF00),
-                  background: Colors.blue.shade200,
-                  leftLabel: "Left",
-                  rightLabel: "Right",
-                  onChange: (_) {},
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// import 'flipping_switch.dart';
+
+// void main() {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+//       .then((_) {
+//     runApp(new MyApp());
+//   });
+// }
+
+// class MyApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       home: MyHome(),
+//     );
+//   }
+// }
+
+// class MyWidzet extends StatelessWidget {
+//   const MyWidzet({Key? key}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return SafeArea(
+//       child: Scaffold(
+//         backgroundColor: Colors.blue,
+//         body: Column(
+//           children: [
+//             Expanded(
+//               flex: 2,
+//               child: Container(
+//                 child: Row(
+//                   children: [
+//                     Expanded(
+//                       child: Lottie.network(
+//                           'https://assets10.lottiefiles.com/packages/lf20_F2C05u.json'),
+//                     ),
+//                     Expanded(
+//                       child: Container(),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//             Expanded(
+//               flex: 5,
+//               child: Row(
+//                 children: [
+//                   Expanded(
+//                     child: Container(),
+//                   ),
+//                   Expanded(
+//                     flex: 5,
+//                     child: Stack(
+//                       children: [
+//                         Padding(
+//                           padding: EdgeInsets.only(top: 24),
+//                           child: PhysicalModel(
+//                             color: Colors.white,
+//                             borderRadius:
+//                                 BorderRadius.only(topLeft: Radius.circular(24)),
+//                             elevation: 16,
+//                             child: Container(
+//                               decoration: BoxDecoration(
+//                                   color: Colors.blue,
+//                                   borderRadius: BorderRadius.only(
+//                                     topLeft: Radius.circular(18),
+//                                   ),
+//                                   boxShadow: [
+//                                     BoxShadow(color: Colors.white30),
+//                                   ]),
+//                               margin: EdgeInsets.only(top: 6, left: 6),
+//                             ),
+//                           ),
+//                         ),
+//                         Padding(
+//                           padding: const EdgeInsets.only(left: 24.0),
+//                           child: Align(
+//                             alignment: Alignment.topCenter,
+//                             child: FlippingSwitch(
+//                               color: Colors.white,
+//                               background: Colors.blue,
+//                               leftLabel: "Left",
+//                               rightLabel: "Right",
+//                               onChange: (_) {},
+//                               tabWidth: 240,
+//                               tabHeight: 48,
+//                             ),
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
